@@ -4,7 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Login</title>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
   <link rel="stylesheet" href="/css/user.css" />
+
 </head>
 <body>
   <main class="container">
@@ -13,8 +15,8 @@
     <div id="error" class="error" style="display:none;"></div>
 
     <form id="login-form">
-      <input type="text" placeholder="Username" id="username" required />
-      <input type="password" placeholder="Password" id="password" required />
+      <input type="text" placeholder="Username" id="username"/>
+      <input type="password" placeholder="Password" id="password"/>
       <button type="submit">Login</button>
     </form>
 
@@ -22,7 +24,8 @@
       Don't have an account? <a href="/signup">Sign up here</a>
     </p>
   </main>
-
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
   <script src="/js/login.js"></script>
 </body>
 </html>

@@ -1,0 +1,81 @@
+body {
+  font-family: system-ui, sans-serif;
+  background-color: #f5f6fa;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+h1 {
+  margin: 2rem 0 1rem;
+  color: #2f3640;
+}
+
+form#create-board-form {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+form#create-board-form input {
+  padding: 0.6rem 1rem;
+  font-size: 1rem;
+  border: 1px solid #dcdde1;
+  border-radius: 6px;
+  width: 250px;
+}
+
+form#create-board-form button {
+  padding: 0.6rem 1.2rem;
+  font-size: 1rem;
+  border: none;
+  background-color: #0984e3;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+form#create-board-form button:hover {
+  background-color: #74b9ff;
+}
+
+#boards-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  padding: 1rem;
+  width: 90%;
+  max-width: 1000px;
+  box-sizing: border-box;
+}
+
+.board-card {
+  background-color: white;
+  border: 1px solid #dcdde1;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.board-card h3 {
+  margin: 0 0 1rem;
+  color: #2d3436;
+  font-size: 1.2rem;
+}
+
+.board-card a {
+  text-decoration: none;
+  color: #0984e3;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.board-card a:hover {
+  color: #74b9ff;
+}

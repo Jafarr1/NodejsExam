@@ -1,0 +1,12 @@
+<div class="task" data-task-id="<%= task._id %>">
+  <span class="task-title"><%= task.title %></span>
+  <input type="text" class="task-edit-input hidden" />
+
+  <div class="task-menu-wrapper">
+    <button class="task-menu-btn" aria-label="Task options">&#8942;</button>
+    <div class="task-menu hidden">
+      <button class="edit-task-btn">Edit</button>
+      <button class="delete-task-btn">Delete</button>
+    </div>
+  </div>
+</div>

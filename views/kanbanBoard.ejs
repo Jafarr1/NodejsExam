@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kanban Board</title>
+  <link rel="stylesheet" href="/css/kanbanBoard.css" />
+</head>
+<body>
+  <main class="kanban-container">
+
+     <section class="invite-members">
+  <h3>Invite Member</h3>
+  <form id="invite-form">
+    <input type="text" id="invite-username" placeholder="Enter username to invite" required />
+    <button type="submit">Invite</button>
+  </form>
+  <p id="invite-message" style="color: red;"></p>
+</section>
+
+    <section class="controls">
+      <form id="list-form">
+        <input id="list-title" type="text" placeholder="New Column Title" required />
+        <button type="submit">+ Add Column</button>
+      </form>
+    </section>
+
+    <section id="board" class="board-container" data-board-id="<%= board._id %>">
+      <% lists.forEach(list => { %>
+        <div class="column" data-list-id="<%= list._id %>">
+          <div class="column-header">
+            <div class="list-title-wrapper">
+              <span class="list-title-text"><%= list.title %></span>
+              <input type="text" class="list-edit-input hidden" />
+            </div>
+
+            <div class="list-menu-wrapper">
+              <button class="list-menu-btn" aria-label="List options">&#8942;</button>
+              <div class="list-menu hidden">
+                <button class="edit-list-btn">Edit</button>
+                <button class="delete-list-btn">Delete</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="task-list">
+            <% tasks
+              .filter(task => task.listId === list._id.toString())
+              .forEach(task => { %>
+              <div class="task" data-task-id="<%= task._id %>">
+                <span class="task-title"><%= task.title %></span>
+                <input type="text" class="task-edit-input hidden" />
+
+                <div class="task-menu-wrapper">
+                  <button class="task-menu-btn" aria-label="Task options">&#8942;</button>
+                  <div class="task-menu hidden">
+                    <button class="edit-task-btn">Edit</button>
+                    <button class="delete-task-btn">Delete</button>
+                  </div>
+                </div>
+              </div>
+            <% }); %>
+          </div>
+
+          <form class="task-form" data-list-id="<%= list._id %>">
+            <input type="text" placeholder="Add a task..." required />
+            <button type="submit">+</button>
+          </form>
+        </div>
+      <% }); %>
+    </section>
+  </main>
+
+  <!-- Task Delete Modal -->
+  <div id="delete-modal" class="modal hidden">
+    <div class="modal-content">
+      <p>Are you sure you want to delete this task?</p>
+      <div class="modal-buttons">
+        <button id="confirm-delete" class="confirm">Delete</button>
+        <button id="cancel-delete" class="cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- List Delete Modal -->
+  <div id="list-delete-modal" class="modal hidden">
+    <div class="modal-content">
+      <p>Are you sure you want to delete this list and all its tasks?</p>
+      <div class="modal-buttons">
+        <button id="confirm-list-delete" class="confirm">Delete</button>
+        <button id="cancel-list-delete" class="cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/kanbanBoard.js"></script>
+</body>
+</html>

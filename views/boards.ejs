@@ -1,0 +1,28 @@
+<!-- views/boards.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Your Boards</title>
+ <link rel="stylesheet" href="/css/board.css">
+</head>
+<body>
+  <h1>Your Boards</h1>
+
+  <form id="create-board-form">
+    <input type="text" id="board-title" placeholder="Board title" required>
+    <button type="submit">Create Board</button>
+  </form>
+
+  <div id="boards-container">
+    <% boards.forEach(board => { %>
+      <div class="board-card">
+        <h3><%= board.title %></h3>
+        <a href="/boards/<%= board._id %>">Open</a>
+      </div>
+    <% }); %>
+  </div>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/boardsPage.js"></script>
+</body>
+</html>

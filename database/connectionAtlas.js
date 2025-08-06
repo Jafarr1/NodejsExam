@@ -22,9 +22,8 @@ async function connectDB() {
 
   return {
     tasks: db.collection("tasks"),
-    users: db.collection("users"),
-    
-    // Add more collections if needed
+    lists: db.collection("lists"),
+    boards: db.collection("boards")
   };
 }
 

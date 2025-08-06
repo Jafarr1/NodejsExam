@@ -1,0 +1,23 @@
+<div class="column" data-list-id="<%= list._id %>">
+  <div class="column-header">
+    <div class="list-title-wrapper">
+      <span class="list-title-text"><%= list.title %></span>
+      <input type="text" class="list-edit-input hidden" />
+    </div>
+
+    <div class="list-menu-wrapper">
+      <button class="list-menu-btn" aria-label="List options">&#8942;</button>
+      <div class="list-menu hidden">
+        <button class="edit-list-btn">Edit</button>
+        <button class="delete-list-btn">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="task-list"></div>
+
+  <form class="task-form" data-list-id="<%= list._id %>">
+    <input type="text" placeholder="Add a task..." required />
+    <button type="submit">+</button>
+  </form>
+</div>

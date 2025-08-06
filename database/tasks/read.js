@@ -1,4 +1,4 @@
-import connectDB from "./connectionAtlas.js";
+import connectDB from "../connectionAtlas.js";
 
 async function getAllTasks() {
   const { tasks } = await connectDB();

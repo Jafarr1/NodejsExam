@@ -1,37 +1,35 @@
 document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('signup-form');
-  const errorDiv = document.getElementById('error');
 
-  form.addEventListener('submit', (e) => {
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
     const username = document.getElementById('username').value.trim();
     const password = document.getElementById('password').value.trim();
 
     if (!username || !password) {
-      return showError('Please fill in all fields.');
+      return toastr.error('Please fill in all fields.');
     }
 
-    const options = {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password }),
-    };
+    try {
+      const res = await fetch('/api/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      });
 
-    fetch('/api/signup', options)
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
+      const data = await res.json();
+
+      if (res.ok) {
+        toastr.success('Signup successful!');
+        setTimeout(() => {
           window.location.href = '/login';
-        } else {
-          showError(data.message || 'Signup failed.');
-        }
-      })
-      .catch(() => showError('Something went wrong. Please try again.'));
+        }, 1200); // 1.5 second delay to show toastr
+      } else {
+        toastr.error(data.message || 'Signup failed.');
+      }
+    } catch (err) {
+      toastr.error('Something went wrong. Please try again.');
+    }
   });
-
-  function showError(msg) {
-    errorDiv.textContent = msg;
-    errorDiv.style.display = 'block';
-  }
 });

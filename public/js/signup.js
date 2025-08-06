@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
         toastr.success('Signup successful!');
         setTimeout(() => {
           window.location.href = '/login';
-        }, 1200); // 1.5 second delay to show toastr
+        }, 1200);
       } else {
         toastr.error(data.message || 'Signup failed.');
       }

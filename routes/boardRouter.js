@@ -30,7 +30,7 @@ router.get('/boards/:id', async (req, res) => {
     const board = await getBoardById(req.params.id);
     if (!board) return res.status(404).json({ error: 'Board not found' });
     res.json(board);
-  } catch {
+  } catch (error) {
     res.status(500).json({ error: 'Failed to fetch board' });
   }
 });
@@ -39,16 +39,13 @@ router.get('/boards/:id', async (req, res) => {
 router.post('/boards', async (req, res) => {
   try {
     const ownerId = getUserId(req);
-    console.log('Creating board for user:', ownerId);
 
     const { title } = req.body;
     if (!title) return res.status(400).json({ error: 'Title is required' });
 
     const board = await createBoard({ title, ownerId });
-    console.log('Board created:', board);
     res.status(201).json(board);
   } catch (error) {
-    console.error('Error creating board:', error);  // <=== Log the error here
     res.status(500).json({ error: 'Failed to create board' });
   }
 });
@@ -57,34 +54,28 @@ router.post('/boards', async (req, res) => {
 router.post('/boards/:id/members', async (req, res) => {
   try {
     const boardId = req.params.id;
-    console.log('Invite request for boardId:', boardId);
-    const { memberId: username } = req.body; // it's a username being passed
+    const { memberId: username } = req.body;
 
     if (!username) {
       return res.status(400).json({ error: 'Username is required' });
     }
 
-    const user = await getUserByUsername(username); // ✅ using SQLite here
+    const user = await getUserByUsername(username);
 
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
 
         const board = await getBoardById(boardId);
-    console.log('Fetched board before update:', board);
 
-    // MongoDB might expect an ObjectId — make sure you handle that if needed
-    const updatedBoard = await addMemberToBoard(boardId, user.id); // ✅ user.id from SQLite
-    console.log('Updated board:', updatedBoard);
+    const updatedBoard = await addMemberToBoard(boardId, user.id);
 
     if (!updatedBoard) {
-      console.log('Board not found after update! Sending 404');
       return res.status(404).json({ error: 'Board not found' });
     }
 
     res.json(updatedBoard);
   } catch (error) {
-    console.error('Failed to add member:', error);
     res.status(500).json({ error: 'Failed to add member to board' });
   }
 });

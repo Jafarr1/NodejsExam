@@ -1,9 +1,11 @@
 import { Router } from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import getListsByBoardId from '../database/lists/read.js'; // ✅ FIXED
+import getListsByBoardId from '../database/lists/read.js';
 import getTasks from '../database/tasks/read.js';
 import { getBoardsByUser, getBoardById } from '../database/boards/read.js';
+import ensureLoggedIn from './middlewareRouter.js';
+
 
 const router = Router();
 const __filename = fileURLToPath(import.meta.url);
@@ -20,19 +22,18 @@ router.get('/signup', (req, res) => {
 });
 
 // All boards (homepage after login)
-router.get('/boards', async (req, res) => {
+router.get('/boards', ensureLoggedIn, async (req, res) => {
   try {
     const userId = req.session.user.id;
     const boards = await getBoardsByUser(userId);
     res.render('boards', { boards });
-  } catch (error) {
-    console.error('Error loading boards:', error);
-    res.status(500).send('Error loading boards');
+  } catch {
+    res.status(500).send('Internal Server Error');
   }
 });
 
 // Specific board view (kanban)
-router.get('/boards/:id', async (req, res) => {
+router.get('/boards/:id', ensureLoggedIn, async (req, res) => {
   try {
     const boardId = req.params.id;
     const board = await getBoardById(boardId);
@@ -42,11 +43,10 @@ router.get('/boards/:id', async (req, res) => {
     }
 
     const lists = await getListsByBoardId(boardId);
-    const tasks = await getTasks(boardId); // Optional: scope tasks to board if you store boardId
+    const tasks = await getTasks(boardId);
 
     res.render('kanbanBoard', { board, lists, tasks });
-  } catch (error) {
-    console.error('Error fetching board or lists:', error);
+  } catch {
     res.status(500).send('Internal Server Error');
   }
 });

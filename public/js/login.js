@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const form     = document.getElementById('login-form');
-  const errorDiv = document.getElementById('error');
+  const form    = document.getElementById('login-form');
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -17,20 +16,20 @@ document.addEventListener('DOMContentLoaded', () => {
       const res = await fetch('/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include', // required for cookie-based sessions
+        credentials: 'include',
         body: JSON.stringify({ username, password })
       });
 
       const data = await res.json();
-if (res.ok) {
-  toastr.success('Login successful!');
-  setTimeout(() => {
-    window.location.href = '/boards';
-  }, 400); // 0.4 seconds delay
-} else {
-  toastr.error(data.message || 'Login failed.');
-}
-    } catch (err) {
+      if (res.ok) {
+        toastr.success('Login successful!');
+        setTimeout(() => {
+          window.location.href = '/boards';
+        }, 1000);
+      } else {
+        toastr.error(data.message || 'Login failed.');
+      }
+    } catch {
       toastr.error('Something went wrong. Please try again.');
     }
   });

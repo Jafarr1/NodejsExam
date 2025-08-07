@@ -22,7 +22,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const board = await res.json();
 
-      // Build DOM elements manually (no innerHTML)
       const boardCard = document.createElement('div');
       boardCard.classList.add('board-card');
 
@@ -39,8 +38,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
       boardTitleInput.value = ''; // Clear input
     } catch (err) {
-      console.error(err);
-      alert('Could not create board. Try again.');
     }
   });
 });

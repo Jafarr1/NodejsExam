@@ -37,7 +37,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (!res.ok) throw new Error('Failed to create board');
 
-      const board = await res.json();
+     const response = await res.json();
+     const board = response.data;
 
       const boardCard = document.createElement('div');
       boardCard.classList.add('board-card');
@@ -53,7 +54,7 @@ document.addEventListener("DOMContentLoaded", () => {
       boardCard.appendChild(boardLink);
       boardsContainer.appendChild(boardCard);
 
-      boardTitleInput.value = ''; // Clear input
+      boardTitleInput.value = '';
     } catch (err) {
     }
   });

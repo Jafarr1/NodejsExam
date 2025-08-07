@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
 
-  const socket = io();
+const socket = io();
 
 socket.on('server-error', (msg) => {
   toastr.error(msg);
@@ -32,27 +32,37 @@ const inviteForm = document.getElementById('invite-form');
 const inviteInput = document.getElementById('invite-username');
 const inviteFeedback = document.getElementById('invite-message');
 
+async function inviteMember(boardId, memberUsername) {
+  const response = await fetch(`/api/boards/${boardId}/members`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ username: memberUsername }),
+  });
 
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || 'Failed to add member');
+  }
+}
 
 
 inviteForm.addEventListener('submit', async (e) => {
   e.preventDefault();
-  inviteFeedback.textContent = ''; // clear previous message
 
   const username = inviteInput.value.trim();
   if (!username) {
-    inviteFeedback.textContent = 'Please enter a username.';
+    toastr.error('Please enter a username.');
     return;
   }
 
   try {
-    await inviteMember(boardId, inviteInput.value);
-    inviteFeedback.style.color = 'green';
-    inviteFeedback.textContent = `User "${inviteInput.value}" invited successfully!`;
+    await inviteMember(boardId, username);
+    toastr.success(`User "${username}" invited successfully!`);
     inviteInput.value = '';
   } catch (error) {
-    inviteFeedback.style.color = 'red';
-    inviteFeedback.textContent = error.message || 'Failed to invite member.';
+    toastr.error(error.message || 'Failed to invite member.');
   }
 });
 
@@ -77,7 +87,8 @@ listForm.addEventListener('submit', async (e) => {
       throw new Error(error.error || 'Failed to create list');
     }
 
-    const createdList = await res.json();
+    const json = await res.json();
+    const createdList = json.data;
     listTitleInput.value = '';
     socket.emit('list-created', createdList);
   } catch (err) {
@@ -87,10 +98,10 @@ listForm.addEventListener('submit', async (e) => {
 
 
   socket.on('new-list-html', (html) => {
-    // Insert the new list HTML snippet into the board container
     board.insertAdjacentHTML('beforeend', html);
   });
 
+  // Create new Task
 board.addEventListener('submit', async (e) => {
   if (!e.target.classList.contains('task-form')) return;
 
@@ -108,8 +119,8 @@ board.addEventListener('submit', async (e) => {
     });
 
     if (!res.ok) throw new Error('Failed to create task');
-    const createdTask = await res.json();
-    socket.emit('task-created', createdTask);
+    const { data: task } = await res.json();
+    socket.emit('task-created', task);
 
     input.value = '';
   } catch (err) {
@@ -322,7 +333,7 @@ board.addEventListener('click', (e) => {
           toastr.error(err.message || 'Failed to update list');
         }
       } else {
-        cancelEdit(); // Cancel if title is empty or unchanged
+        cancelEdit();
       }
     };
 
@@ -345,6 +356,14 @@ board.addEventListener('click', (e) => {
 
     input.addEventListener('keydown', handleKey);
     input.addEventListener('blur', cancelEdit);
+  }
+});
+
+socket.on('list-updated', ({ id, title }) => {
+  const column = document.querySelector(`.column[data-list-id="${id}"]`);
+  if (column) {
+    const titleSpan = column.querySelector('.list-title-text');
+    titleSpan.textContent = title;
   }
 });
 
@@ -397,29 +416,34 @@ taskLists.forEach(taskList => {
   new Sortable(taskList, {
     group: 'shared-tasks',
     animation: 150,
-    onEnd: async (evt) => {
-      const taskId = evt.item.dataset.taskId;
-      const newListId = evt.to.closest('.column').dataset.listId;
+onEnd: async (evt) => {
+  const taskId = evt.item.dataset.taskId;
+  const newList = evt.to.closest('.column');
+  const newListId = newList.dataset.listId;
 
+  // Calculate new order based on position
+  const taskElements = [...newList.querySelectorAll('.task')];
+  const newOrder = taskElements.findIndex(el => el.dataset.taskId === taskId);
 
-      try {
-        const res = await fetch(`/api/boards/${boardId}/tasks/${taskId}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ listId: newListId })
-        });
+  try {
+    const res = await fetch(`/api/boards/${boardId}/tasks/${taskId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ listId: newListId, order: newOrder })
+    });
 
-        if (!res.ok) {
-          const error = await res.json();
-          throw new Error(error.error || 'Failed to move task');
-        }
-        const updatedTask = await res.json();
-        socket.emit('task-moved', updatedTask);
-
-      } catch (err) {
-        toastr.error(err.message || 'Error moving task');
-      }
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(error.error || 'Failed to move task');
     }
+
+    const updatedTask = await res.json();
+    socket.emit('task-moved', updatedTask);
+  } catch (err) {
+    toastr.error(err.message || 'Error moving task');
+  }
+}
+
   });
 });
 
@@ -474,24 +498,4 @@ socket.on('lists-reordered', (updatedLists) => {
   });
 
 });
-
-async function inviteMember(boardId, memberUsername) {
-  try {
-    const response = await fetch(`/api/boards/${boardId}/members`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ username: memberUsername }),
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'Failed to add member');
-    }
-
-  } catch (error) {
-    toastr.error(error.message || 'Failed to invite member');
-  }
-}
 });

@@ -14,7 +14,7 @@ router.post('/signup', async (req, res) => {
   try {
     const existingUser = await getUserByUsername(username);
     if (existingUser) {
-      return res.status(409).json({ message: 'Username already taken.' });
+      return res.status(400).json({ message: 'Username already taken.' });
     }
 
     const hashedPassword = await bcrypt.hash(password, 12);

@@ -20,12 +20,7 @@ async function addMemberToBoard(boardId, memberId) {
     { returnDocument: 'after' }
   );
 
-  console.log('findOneAndUpdate full result:', result);       // The whole object
-  const updatedDoc = result.value || result;
-
-  console.log('Resolved updated document:', updatedDoc);
-
-  return updatedDoc;
+  return result.value;
 }
 
 

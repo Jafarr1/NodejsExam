@@ -5,7 +5,7 @@ async function deleteList(id, boardId) {
   const { lists } = await connectDB();
   const result = await lists.deleteOne({
     _id: new ObjectId(id),
-    boardId: new ObjectId(boardId), // ⬅ Ensure it's from the right board
+    boardId: new ObjectId(boardId),
   });
   return result.deletedCount === 1;
 }

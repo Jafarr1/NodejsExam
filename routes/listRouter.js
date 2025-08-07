@@ -21,8 +21,9 @@ router.get('/boards/:boardId/lists', async (req, res) => {
 router.post('/boards/:boardId/lists', async (req, res) => {
   try {
     const { boardId } = req.params;
-    const newList = { ...req.body, boardId };
-    const createdList = await createList(newList);
+    const { title } = req.body;
+    const createdList = await createList({ title, boardId })
+
     res.status(201).json({ data: createdList });
   } catch (error) {
     res.status(500).json({ error: 'Failed to create list' });
@@ -32,11 +33,13 @@ router.post('/boards/:boardId/lists', async (req, res) => {
 // PUT reorder lists in a board
 router.put('/boards/:boardId/lists/reorder', async (req, res) => {
   try {
+    const { boardId } = req.params;
     const updatedLists = req.body;
+
     await Promise.all(
-      updatedLists.map(({ id, order }) => updateList(id, { order }))
+      updatedLists.map(({ id, order }) => updateList(id, boardId, { order }))
     );
-    res.json({ message: 'Lists reordered successfully' });
+    res.json({ data: 'Lists reordered successfully' });
   } catch (error) {
     res.status(500).json({ error: 'Failed to reorder lists' });
   }
@@ -45,25 +48,25 @@ router.put('/boards/:boardId/lists/reorder', async (req, res) => {
 // PUT update a specific list
 router.put('/boards/:boardId/lists/:id', async (req, res) => {
   try {
-    const { id } = req.params;
+    const { id, boardId } = req.params;
     const updates = req.body;
-    const updatedList = await updateList(id, updates);
+    const updatedList = await updateList(id, boardId, updates);
 
-        if (!updatedList) {
+    if (!updatedList) {
       return res.status(404).json({ error: 'List not found' });
     }
 
-    res.json({ data: updatedList });
+    return res.json({ data: updatedList });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to update list' });
+    return res.status(500).json({ error: 'Failed to update list' });
   }
-});
+}); 
 
 // DELETE a list from a board
 router.delete('/boards/:boardId/lists/:id', async (req, res) => {
   try {
-    const { id } = req.params;
-    const success = await deleteList(id);
+    const { id, boardId } = req.params;
+    const success = await deleteList(id, boardId);
 
     if (!success) {
       return res.status(404).json({ error: 'List not found' });

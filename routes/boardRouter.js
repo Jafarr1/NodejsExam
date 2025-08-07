@@ -83,7 +83,7 @@ router.post('/boards/:id/members', async (req, res) => {
 
 
 
-// PUT update board (rename, etc.)
+// PUT update board
 router.put('/boards/:id', async (req, res) => {
   try {
     const updatedBoard = await updateBoard(req.params.id, req.body);

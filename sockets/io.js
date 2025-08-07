@@ -7,7 +7,6 @@ const __dirname = path.dirname(__filename);
 
 export default function initSocketIO(io) {
   io.on('connection', (socket) => {
-    console.log('A client connected', socket.id);
 
     socket.on('list-created', async (newList) => {
       try {
@@ -27,7 +26,6 @@ export default function initSocketIO(io) {
       path.join(__dirname, '../views/partials/task.ejs'),
       { task }
     );
-    console.log('Rendered task html:', html);
     io.emit('new-task-html', { html, listId: task.listId });
   } catch (err) {
     socket.emit('server-error', 'Failed to render task partial');
@@ -62,7 +60,6 @@ export default function initSocketIO(io) {
 });
 
     socket.on('disconnect', () => {
-      console.log('A client disconnected', socket.id);
     });
   });
 }

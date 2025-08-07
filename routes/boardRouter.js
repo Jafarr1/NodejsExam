@@ -19,7 +19,7 @@ router.get('/boards', async (req, res) => {
     if (!userId) return res.status(401).json({ error: 'Not authenticated' });
 
     const boards = await getBoardsByUser(userId);
-    res.json(boards);
+    res.json({ data: boards});
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch boards' });
   }
@@ -31,7 +31,7 @@ router.get('/boards/:id', async (req, res) => {
     const board = await getBoardById(req.params.id);
     if (!board) return res.status(404).json({ error: 'Board not found' });
 
-    res.json(board);
+    res.json({ data: board });
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch board' });
   }
@@ -43,16 +43,18 @@ router.post('/boards', async (req, res) => {
     const ownerId = getUserId(req);
     const { title } = req.body;
 
-    if (!title) return res.status(400).json({ error: 'Title is required' });
+    if (!title) {
+      return res.status(400).json({ error: 'Title is required' });
+    }
 
     const board = await createBoard({ title, ownerId });
-    res.status(201).json(board);
+    res.status(201).json({ data: board });
   } catch (error) {
     res.status(500).json({ error: 'Failed to create board' });
   }
 });
 
-// POST invite/add a member to a board by username (or userId)
+// POST invite/add a member to a board by username
 router.post('/boards/:id/members', async (req, res) => {
   try {
     const boardId = req.params.id;
@@ -73,7 +75,7 @@ router.post('/boards/:id/members', async (req, res) => {
     }
 
     const updatedBoard = await addMemberToBoard(boardId, user.id);
-    res.json(updatedBoard);
+    res.status(201).json({ data: updatedBoard });
   } catch (error) {
     res.status(500).json({ error: 'Failed to add member to board' });
   }
@@ -86,12 +88,11 @@ router.put('/boards/:id', async (req, res) => {
   try {
     const updatedBoard = await updateBoard(req.params.id, req.body);
 
-
     if (!updatedBoard) {
       return res.status(404).json({ error: 'Board not found' });
     }
 
-    res.json(updatedBoard);
+  res.json({ data: updatedBoard });
   } catch (error) {
     res.status(500).json({ error: 'Failed to update board' });
   }
@@ -101,12 +102,11 @@ router.put('/boards/:id', async (req, res) => {
 router.delete('/boards/:id', async (req, res) => {
   try {
     const success = await deleteBoard(req.params.id);
-    
-        if (!success) {
+    if (!success) {
       return res.status(404).json({ error: 'Board not found' });
     }
 
-    res.json({ message: 'Board deleted' });
+    res.status(204).send();
   } catch (error) {
     res.status(500).json({ error: 'Failed to delete board' });
   }

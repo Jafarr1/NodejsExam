@@ -1,9 +1,7 @@
-// sockets/io.js
 import ejs from 'ejs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-// Required because you're using ES Modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -12,7 +10,6 @@ export default function initSocketIO(io) {
     console.log('A client connected', socket.id);
 
     socket.on('list-created', async (newList) => {
-      // existing code for list-created
       try {
         const html = await ejs.renderFile(
           path.join(__dirname, '../views/partials/list.ejs'),
@@ -20,7 +17,7 @@ export default function initSocketIO(io) {
         );
         io.emit('new-list-html', html);
       } catch (err) {
-        console.error('Failed to render list partial:', err);
+        socket.emit('server-error', 'Failed to render list partial');
       }
     });
 
@@ -33,28 +30,35 @@ export default function initSocketIO(io) {
     console.log('Rendered task html:', html);
     io.emit('new-task-html', { html, listId: task.listId });
   } catch (err) {
-    console.error('Failed to render task partial:', err);
+    socket.emit('server-error', 'Failed to render task partial');
   }
 });
 
-    // NEW: listen for task delete events
+
+
+
     socket.on('task-deleted', (taskId) => {
-      console.log('Task deleted:', taskId);
       socket.broadcast.emit('task-deleted', taskId);
     });
 
     socket.on('list-deleted', (listId) => {
-      console.log('List deleted:', listId);
       socket.broadcast.emit('list-deleted', listId);
     });
 
         socket.on('list-updated', (updatedList) => {
-        console.log('List updated:', updatedList);
         socket.broadcast.emit('list-updated', updatedList);
     });
 
     socket.on('task-updated', (updatedTask) => {
   socket.broadcast.emit('task-updated', updatedTask);
+});
+
+  socket.on('lists-reordered', (updatedLists) => {
+    socket.broadcast.emit('lists-reordered', updatedLists);
+  });
+
+  socket.on('task-moved', (updatedTask) => {
+  socket.broadcast.emit('task-moved', updatedTask);
 });
 
     socket.on('disconnect', () => {

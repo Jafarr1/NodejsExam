@@ -1,5 +1,28 @@
 document.addEventListener("DOMContentLoaded", () => {
+  const logoutBtn = document.getElementById('logout-btn');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', async () => {
+      try {
+        const res = await fetch('/api/logout', { method: 'POST' });
+        if (res.ok) {
+          window.location.href = '/login';
+        } else {
+          const error = await res.json();
+          toastr.error(error.error || 'Logout failed');
+        }
+      } catch (err) {
+        toastr.error(err.message || 'Could not create list');;
+      }
+    });
+  }
+
+
   const socket = io();
+
+socket.on('server-error', (msg) => {
+  toastr.error(msg);
+});
+
   const board = document.getElementById('board');
   const listForm = document.getElementById('list-form');
   const listTitleInput = document.getElementById('list-title');
@@ -8,6 +31,8 @@ document.addEventListener("DOMContentLoaded", () => {
 const inviteForm = document.getElementById('invite-form');
 const inviteInput = document.getElementById('invite-username');
 const inviteFeedback = document.getElementById('invite-message');
+
+
 
 
 inviteForm.addEventListener('submit', async (e) => {
@@ -352,7 +377,7 @@ board.addEventListener('click', (e) => {
     socket.emit('list-deleted', listId);
 
     listToDelete.remove(); 
-    } catch {
+    } catch (err) {
       toastr.error(err.message || 'Failed to delete list');
     } finally {
       listModal.classList.add('hidden');
@@ -372,7 +397,6 @@ taskLists.forEach(taskList => {
   new Sortable(taskList, {
     group: 'shared-tasks',
     animation: 150,
-
     onEnd: async (evt) => {
       const taskId = evt.item.dataset.taskId;
       const newListId = evt.to.closest('.column').dataset.listId;
@@ -403,8 +427,7 @@ taskLists.forEach(taskList => {
 new Sortable(board, {
   animation: 150,
   handle: '.list-title-text',
-  onEnd: async (evt) => {
-    // After drag ends, get all list ids in new order
+  onEnd: async () => {
     const lists = [...board.querySelectorAll('.column')];
     const updatedLists = lists.map((list, index) => ({
       id: list.dataset.listId,
@@ -418,12 +441,38 @@ new Sortable(board, {
         body: JSON.stringify(updatedLists)
       });
 
-      if (!res.ok) throw new Error('Failed to reorder lists');
+            if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error?.error || 'Failed to reorder lists');
+      }
+
       socket.emit('lists-reordered', updatedLists);
     } catch (err) {
-      toastr.error(err.message || 'Error moving task');
+      toastr.error(err.message || 'Failed to reorder lists');
     }
   }
+});
+
+socket.on('task-moved', (updatedTask) => {
+  const taskEl = document.querySelector(`[data-task-id="${updatedTask._id}"]`);
+  const newListEl = document.querySelector(`.column[data-list-id="${updatedTask.listId}"] .task-list`);
+
+  if (taskEl && newListEl) {
+    newListEl.appendChild(taskEl);
+  }
+});
+
+socket.on('lists-reordered', (updatedLists) => {
+  const boardEl = document.getElementById('board');
+  if (!boardEl) return;
+
+  updatedLists.forEach(({ id, order }) => {
+    const listEl = boardEl.querySelector(`.column[data-list-id="${id}"]`);
+    if (listEl) {
+      listEl.style.order = order;
+    }
+  });
+
 });
 
 async function inviteMember(boardId, memberUsername) {

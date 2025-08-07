@@ -33,7 +33,6 @@ router.post('/boards/:boardId/tasks', async (req, res) => {
 router.put('/boards/:boardId/tasks/:id', async (req, res) => {
   const { id } = req.params;
   const updates = req.body;
-  // optionally check boardId here if needed
   try {
     const result = await updateTask(id, updates);
     res.json(result);
@@ -45,7 +44,6 @@ router.put('/boards/:boardId/tasks/:id', async (req, res) => {
 // DELETE a task
 router.delete('/boards/:boardId/tasks/:id', async (req, res) => {
   const { id } = req.params;
-  // optionally check boardId here if needed
   try {
     const result = await deleteTask(id);
     res.json(result);

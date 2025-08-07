@@ -26,7 +26,7 @@ router.get('/boards', ensureLoggedIn, async (req, res) => {
   try {
     const userId = req.session.user.id;
     const boards = await getBoardsByUser(userId);
-    res.render('boards', { boards });
+    res.render('boards', { boards, user: req.session.user });
   } catch {
     res.status(500).send('Internal Server Error');
   }
@@ -45,7 +45,7 @@ router.get('/boards/:id', ensureLoggedIn, async (req, res) => {
     const lists = await getListsByBoardId(boardId);
     const tasks = await getTasks(boardId);
 
-    res.render('kanbanBoard', { board, lists, tasks });
+    res.render('kanbanBoard', { board, lists, tasks, user: req.session.user });
   } catch {
     res.status(500).send('Internal Server Error');
   }

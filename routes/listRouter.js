@@ -11,7 +11,7 @@ router.get('/boards/:boardId/lists', async (req, res) => {
   try {
     const { boardId } = req.params;
     const lists = await getLists(boardId);
-    res.json(lists);
+    res.json({ data: lists });
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch lists' });
   }
@@ -22,8 +22,8 @@ router.post('/boards/:boardId/lists', async (req, res) => {
   try {
     const { boardId } = req.params;
     const newList = { ...req.body, boardId };
-    const result = await createList(newList);
-    res.status(201).json(result);
+    const createdList = await createList(newList);
+    res.status(201).json({ data: createdList });
   } catch (error) {
     res.status(500).json({ error: 'Failed to create list' });
   }
@@ -38,7 +38,6 @@ router.put('/boards/:boardId/lists/reorder', async (req, res) => {
     );
     res.json({ message: 'Lists reordered successfully' });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ error: 'Failed to reorder lists' });
   }
 });
@@ -48,8 +47,13 @@ router.put('/boards/:boardId/lists/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const updates = req.body;
-    const result = await updateList(id, updates);
-    res.json(result);
+    const updatedList = await updateList(id, updates);
+
+        if (!updatedList) {
+      return res.status(404).json({ error: 'List not found' });
+    }
+
+    res.json({ data: updatedList });
   } catch (error) {
     res.status(500).json({ error: 'Failed to update list' });
   }
@@ -60,11 +64,12 @@ router.delete('/boards/:boardId/lists/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const success = await deleteList(id);
-    if (success) {
-      res.json({ message: 'List deleted' });
-    } else {
-      res.status(404).json({ error: 'List not found' });
+
+    if (!success) {
+      return res.status(404).json({ error: 'List not found' });
     }
+
+    res.status(204).send();
   } catch (error) {
     res.status(500).json({ error: 'Failed to delete list' });
   }

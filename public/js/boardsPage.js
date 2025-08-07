@@ -1,4 +1,21 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", () => {
+  const logoutBtn = document.getElementById('logout-btn');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', async () => {
+      try {
+        const res = await fetch('/api/logout', { method: 'POST' });
+        if (res.ok) {
+          window.location.href = '/login';
+        } else {
+          const error = await res.json();
+          toastr.error(error.error || 'Logout failed');
+        }
+      } catch (err) {
+        toastr.error(err.message || 'Could not create list');
+      }
+    });
+  }
+
   const boardForm = document.getElementById('create-board-form');
   const boardTitleInput = document.getElementById('board-title');
   const boardsContainer = document.getElementById('boards-container');

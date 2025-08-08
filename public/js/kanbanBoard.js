@@ -417,11 +417,10 @@ taskLists.forEach(taskList => {
     group: 'shared-tasks',
     animation: 150,
 onEnd: async (evt) => {
-  const taskId = evt.item.dataset.taskId;
   const newList = evt.to.closest('.column');
   const newListId = newList.dataset.listId;
 
-  // Calculate new order based on position
+   const taskId = evt.item.dataset.taskId;
   const taskElements = [...newList.querySelectorAll('.task')];
   const newOrder = taskElements.findIndex(el => el.dataset.taskId === taskId);
 

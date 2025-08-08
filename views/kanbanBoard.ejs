@@ -6,33 +6,35 @@
   <title>Kanban Board</title>
   <link rel="stylesheet" href="/css/kanbanBoard.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
-
 </head>
 <body>
-  <header class="app-header">
+<header class="app-header">
   <div class="header-content">
-    <a href="/boards" class="back-link">← All Boards</a>
+    <a href="/boards" class="back-link">&#8592; All Boards</a>
     <span>Logged in as <%= user.username %></span>
     <button id="logout-btn">Logout</button>
   </div>
 </header>
   <main class="kanban-container">
 
-     <section class="invite-members">
-  <h3>Invite Member</h3>
-  <form id="invite-form">
-    <input type="text" id="invite-username" placeholder="Enter username to invite" required />
-    <button type="submit">Invite</button>
-  </form>
-  <p id="invite-message" style="color: red;"></p>
-</section>
+  <section class="combined-box">
+  <div class="invite-members">
+    <h3>Invite Member</h3>
+    <form id="invite-form">
+      <input type="text" id="invite-username" placeholder="Enter username to invite" required />
+      <button type="submit">Invite</button>
+    </form>
+    <p id="invite-message"></p>
+  </div>
 
-    <section class="controls">
-      <form id="list-form">
-        <input id="list-title" type="text" placeholder="New Column Title" required />
-        <button type="submit">+ Add Column</button>
-      </form>
-    </section>
+  <div class="add-column">
+    <h3>Add Column</h3>
+    <form id="list-form">
+      <input id="list-title" type="text" placeholder="New Column Title" required />
+      <button type="submit">+ Add Column</button>
+    </form>
+  </div>
+</section>
 
     <section id="board" class="board-container" data-board-id="<%= board._id %>">
       <% lists.forEach(list => { %>

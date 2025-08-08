@@ -6,7 +6,6 @@ async function deleteBoard(boardId) {
 
   const boardObjectId = new ObjectId(boardId);
 
-  // Optionally also delete all related lists and tasks
   await lists.deleteMany({ boardId: boardObjectId });
   await tasks.deleteMany({ boardId: boardObjectId });
 

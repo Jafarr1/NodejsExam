@@ -3,7 +3,7 @@ import connectDB from "../connectionAtlas.js";
 async function createBoard(board) {
   const { boards } = await connectDB();
 
-  const userId = String(board.ownerId); // convert to string for MongoDB
+  const userId = String(board.ownerId);
 
   const result = await boards.insertOne({
     title: board.title,
